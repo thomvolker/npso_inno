@@ -1,0 +1,253 @@
+---
+title: "Density ratios"
+subtitle: "Evaluating and improving the utility of synthetic data"
+author: "Thom Benjamin Volker <br> [t.b.volker@uu.nl](mailto:t.b.volker@uu.nl)"
+format: 
+  revealjs:
+    slide-number: true
+    df-print: kable
+    html-math-method: katex
+    theme: dark
+---
+
+# Imagine you have access to all the data in the world
+
+_What a privacy disaster would that be..._
+
+::: {.notes}
+
+Imagine you have access to all the data in the world. 
+What a privacy disaster would that be...
+But also, what a great opportunity to learn about the world!
+How many research questions could we answer if we had that much data. 
+Unfortunately, or fortunately, we will never get access to all the data in the world, not in the last place because the data cannot be shared openly.
+
+:::
+
+# If real data is no option,
+
+_maybe synthetic data is!_
+
+
+::: {.notes}
+
+Synthetic data is fake data, simulated data or generated data. 
+As opposed to real data, synthetic data is not collected from real people, but generated from a model.
+If the model is a good approximation to reality, the synthetic data can be very useful. 
+Because the synthetic data do not map back to individuals, it substantially reduces privacy risks.
+
+:::
+
+#
+
+If the synthetic data is good enough, it is almost as useful as real data
+
+<br>
+
+If the synthetic data is as useful as the real data, it is good enough
+
+<br>
+
+__How can we tell whether the synthetic data is good enough?__
+
+::: {.notes}
+
+If the synthetic data is good enough, it is almost as useful as real data. 
+However, this is a big if. Generating high quality synthetic data is generally not an easy task. 
+Moreover, even evaluating whether the synthetic data is good enough is not trivial. 
+Typically, the synthetic data is good enough if we can use it for the same task as the real data, and get similar results.
+However, we often don't know beforehand what the synthetic data will be used for. 
+If we would have known, we could just run the analysis on the real data and share the results. 
+So the question is, how can we tell whether the synthetic data is good enough?
+That is, we need a general framework that we can use to evaluate whether the synthetic data is close enough to the real data.
+
+:::
+
+# Density ratios for utility^[See _Masashi, Suzuki & Kanamori (2012). Density ratio estimation in machine learning._]
+
+<br>
+<br>
+
+$$r(x) = \frac{p(\boldsymbol{X}_{\text{syn }})}{p(\boldsymbol{X}_{\text{obs}})}$$
+<br>
+<br>
+<br>
+<br>
+
+::: {.notes}
+
+We propose that density ratios are very suitable for this task. 
+Density ratio estimation is a set of techniques developed in machine learning to estimate the ratio of two probability density functions.
+The density ratio can be used for various tasks, as broad as change-point detection, prediction and two-sample testing. 
+But, we argue, it is also very useful for evaluating the utility of synthetic data.
+That is, if the observed and synthetic data have similar density over the entire multivariate space, then any analysis will yield similar results. 
+That is, if the density ratio is close to one at every point in the multivariate space, then the synthetic data is good enough. 
+If the density ratio is far from one in some subspace of the data, we have to improve the synthetic data in that subspace.
+Importantly, the density ratio is estimated directly, rather than estimating the two probability density functions separately and then taking their ratio to improve estimation accuracy. 
+
+:::
+
+## Density ratios for utility evaluation
+
+<!-- $$r(x) = \frac{p(\boldsymbol{X}_{\text{syn }})}{p(\boldsymbol{X}_{obs})}$$ -->
+
+```{r}
+#| fig-align: center
+library(patchwork)
+library(ggplot2)
+
+
+
+dlaplace <- function(x, mu = 0, sd = 1) exp(-abs(x-mu)/(sd / sqrt(2))) / (2*(sd / sqrt(2)))
+dratio_lap_norm <- function(x, mu = 0, sd = 1) {
+  dnorm(x, mu, sd) / dlaplace(x, mu, sd)
+}
+
+ggplot() +
+  stat_function(fun = dlaplace, args = list(mu = 0, sd = 1),
+                col = "#FDAE61", linewidth = 1, linetype = 1) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                col = "#F46D43", linewidth = 1, linetype = 4) +
+  xlim(-5, 5) +
+  ylim(0, 0.8) +
+  ggdark::dark_mode() +
+  ylab(NULL) +
+ggplot() +
+  stat_function(fun = dratio_lap_norm, args = list(mu = 0, sd = 1),
+                linewidth = 1, linetype = 1, col = "#FEE08B") +
+  xlim(-5, 5) +
+  ylim(0, 2) +
+  ggdark::dark_mode() +
+  ylab(NULL) +
+ggplot() +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                col = "#FDAE61", linewidth = 1, linetype = 1) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                col = "#F46D43", linewidth = 1, linetype = 4) +
+  xlim(-5, 5) +
+  ylim(0, 0.8) +
+  ggdark::dark_mode() +
+  ylab(NULL) +
+ggplot() +
+  geom_abline(intercept = 1, slope = 0, linewidth = 1, linetype = 1,
+              col = "#FEE08B") +
+  ggdark::dark_mode() +
+  xlim(-5, 5) +
+  ylim(0, 2) +
+  ylab(NULL)
+```
+## Density ratios in practice
+
+1. Estimate the density ratio directly and non-parametrically
+
+- Implemented in `R`-package [`densityratio`](https://github.com/thomvolker/densityratio)
+
+2. Calculate a discrepancy measure for the synthetic data
+
+- Kullback-Leibler divergence; Pearson divergence
+
+3. Compare discrepancy measures for different data sets
+
+4. Optionally: Test the null hypothesis $p(\boldsymbol{X}_{\text{syn}}) = p(\boldsymbol{X}_{\text{obs}})$
+
+## Density ratios for synthetic data (multivariate examples) {.smaller}
+
+### U.S. Current Population Survey (n = 5000)^[Thanks to Jörg Drechsler for sharing the data.]
+
+- Four continuous variables (_age, income, social security payments, household income_)
+- Four categorical variables (_sex, race, marital status, educational attainment_)
+
+### Synthetic data models
+
+(Multinomial) logistic regression for categorical variables
+
+1. Linear regression
+2. Linear regression with transformations (cubic root)
+3. Linear regression with transformations and semi-continuous modelling
+
+## Utility of the synthetic data
+
+![](files/syn-PEs.png)
+
+## Reweighting synthetic data: regression coefficients
+
+```{r}
+library(tibble)
+library(densityratio)
+library(patchwork)
+
+set.seed(23)
+N <- 1000
+obs <- tibble(
+  x = rnorm(N, 0, 1),
+  y = 0.5*x+rnorm(N,0,sqrt(3/4))
+)
+syn <- tibble(
+  x = rnorm(N, 0, 1),
+  y = rnorm(N, 0, 1)
+)
+
+fit <- ulsif(obs, syn, lambda = 0.0001)
+w   <- predict(fit, syn)
+
+ggplot(obs) +
+  geom_point(aes(x, y), alpha = 0.4) +
+  ggdark::dark_mode() +
+  ggtitle("Original data") +
+ggplot(syn) +
+  geom_point(aes(x, y, col = w), alpha = 0.5) +
+  scale_color_viridis_c(begin = 0.7, end = 0.7, option = "F") +
+  ggdark::dark_mode() +
+  theme(legend.position = "none") +
+  ggtitle("Synthetic data")
+```
+
+## Reweighting synthetic data: regression coefficients
+
+```{r}
+ggplot(obs) +
+  geom_point(aes(x, y), alpha = 0.4) +
+  ggdark::dark_mode() +
+  ggtitle("Original data") +
+ggplot(syn) +
+  geom_point(aes(x, y, col = w), alpha = 0.5) +
+  scale_color_viridis_c(begin = 0.3, end = 1, option = "F") +
+  ggdark::dark_mode() +
+  ggtitle("Synthetic data")
+```
+
+## Reweighting synthetic data: regression coefficients
+
+
+```{r}
+fit_obs <- lm(y ~ x, data = obs)
+fit_syn <- lm(y ~ x, data = syn)
+fit_wgt <- lm(y ~ x, data = syn, weights = pmax(0,w))
+
+matrix(c(coef(fit_obs), coef(fit_syn), coef(fit_wgt)), 2,
+       dimnames = list(c("b0", "b1"), c("Observed", "Synthetic", "Reweighted"))) |>
+  data.frame()
+```
+## Other advantages of density ratios for utility
+
+__Use density ratios to discard synthetic outliers__
+
+
+__High-dimensional extensions__
+
+- Find a $m < p$-dimensional subspace in which the synthetic and observed data are maximally different
+
+- Estimate the density ratio in this subspace
+
+
+__Automatic cross-validation for hyperparameter selection__
+
+# Thanks for your attention!
+
+_Even if it was simulated..._
+
+<br>
+
+__Questions?__
+
+[t.b.volker@uu.nl](mailto:t.b.volker@uu.nl)
