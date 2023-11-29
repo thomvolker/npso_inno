@@ -417,7 +417,7 @@ Thom Benjamin Volker <br> <a href="mailto:t.b.volker@uu.nl">t.b.volker@uu.nl</a>
 <p><br> <br></p>
 <p><span class="math display">r(x) = \frac{p(\boldsymbol{X}_{\text{syn }})}{p(\boldsymbol{X}_{\text{obs}})}</span> <br> <br> <br> <br></p>
 <aside class="notes">
-<p>We propose that density ratios are very suitable for this task. Density ratio estimation is a set of techniques developed in machine learning to estimate the ratio of two probability density functions. The density ratio can be used for various tasks, as broad as change-point detection, prediction and two-sample testing. But, we argue, it is also very useful for evaluating the utility of synthetic data. That is, if the observed and synthetic data have similar density over the entire multivariate space, then any analysis will yield similar results. That is, if the density ratio is close to one at every point in the multivariate space, then the synthetic data is good enough. If the density ratio is far from one in some subspace of the data, we have to improve the synthetic data in that subspace. Importantly, the density ratio is estimated directly, rather than estimating the two probability density functions separately and then taking their ratio to improve estimation accuracy.</p>
+<p>We propose that density ratios are very suitable for this task. Density ratio estimation is a set of techniques developed in machine learning to estimate the ratio of two probability density functions. The density ratio can be used for various tasks, as broad as change-point detection, prediction and two-sample testing. But it is also very useful for evaluating the utility of synthetic data. That is, if the observed and synthetic data have similar density over the entire multivariate space, then any analysis will yield similar results. So, this means that if the density ratio is close to one at every point in the multivariate space, then the synthetic data is good enough. If the density ratio is far from one in some subspace of the data, we have to improve the synthetic data in that subspace. Importantly, the density ratio is estimated directly, rather than estimating the two probability density functions separately and then taking their ratio to improve estimation accuracy.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -458,7 +458,7 @@ Thom Benjamin Volker <br> <a href="mailto:t.b.volker@uu.nl">t.b.volker@uu.nl</a>
 <h2>Density ratios for synthetic data (multivariate examples)</h2>
 <h3 id="u.s.-current-population-survey-n-5000">U.S. Current Population Survey (n = 5000)<sup>1</sup></h3>
 <ul>
-<li>Four continuous variables (<em>age, income, social security payments, household income</em>)</li>
+<li>Four continuous variables (<em>age, income, social security payments, household taxes</em>)</li>
 <li>Four categorical variables (<em>sex, race, marital status, educational attainment</em>)</li>
 </ul>
 <h3 id="synthetic-data-models">Synthetic data models</h3>

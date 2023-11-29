@@ -79,9 +79,9 @@ $$r(x) = \frac{p(\boldsymbol{X}_{\text{syn }})}{p(\boldsymbol{X}_{\text{obs}})}$
 We propose that density ratios are very suitable for this task. 
 Density ratio estimation is a set of techniques developed in machine learning to estimate the ratio of two probability density functions.
 The density ratio can be used for various tasks, as broad as change-point detection, prediction and two-sample testing. 
-But, we argue, it is also very useful for evaluating the utility of synthetic data.
+But it is also very useful for evaluating the utility of synthetic data.
 That is, if the observed and synthetic data have similar density over the entire multivariate space, then any analysis will yield similar results. 
-That is, if the density ratio is close to one at every point in the multivariate space, then the synthetic data is good enough. 
+So, this means that if the density ratio is close to one at every point in the multivariate space, then the synthetic data is good enough. 
 If the density ratio is far from one in some subspace of the data, we have to improve the synthetic data in that subspace.
 Importantly, the density ratio is estimated directly, rather than estimating the two probability density functions separately and then taking their ratio to improve estimation accuracy. 
 
@@ -154,7 +154,7 @@ ggplot() +
 
 ### U.S. Current Population Survey (n = 5000)^[Thanks to Jörg Drechsler for sharing the data.]
 
-- Four continuous variables (_age, income, social security payments, household income_)
+- Four continuous variables (_age, income, social security payments, household taxes_)
 - Four categorical variables (_sex, race, marital status, educational attainment_)
 
 ### Synthetic data models
